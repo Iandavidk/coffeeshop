@@ -32,17 +32,20 @@ CORS(app)
 @app.route('/')
 def index():
  
-  return '<h1>hello, you are succesfully connected </h1>'
+  return '<h1>Hello, Welome to CoffesShop API </h1>'
 #this endpoint give you all drinks
 @app.route('/drinks')
-def drink():
- drinks=Drink.query.all()
-
- 
- return jsonify({
+def retrieve_drinks():
+    try:
+        drinks = Drink.query.order_by(Drink.id).all()
+        drinks = [drink.short() for drink in drinks]
+    except Exception:
+        abort(404)
+    return jsonify({
         'success': True,
-        'drinks': [d.short() for d in drinks]
-        }), 200
+        'drinks': drinks
+    }), 200
+
 
 
 '''
