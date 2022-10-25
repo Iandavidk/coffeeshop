@@ -32,7 +32,7 @@ CORS(app)
 @app.route('/')
 def index():
  
-  return '<h1>Hello, Welome to CoffeeShop API </h1>'
+  return '<h1>Hello, Welcome to CoffeeShop API </h1>'
 #this endpoint give you all drinks
 @app.route('/drinks')
 def retrieve_drinks():
