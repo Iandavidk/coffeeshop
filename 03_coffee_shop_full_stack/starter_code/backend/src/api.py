@@ -144,35 +144,31 @@ def modify_drinks(payload, id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-@app.route('/drinks/<idt>',methods=['DELETE'])
+@app.route('/drinks/<int:id>',methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete(payload,idt):
- 
-  drink = Drink.query.filter(Drink.id ==idt).one_or_none()
-  if not drink:
-   abort(404)
-  try:
-   drink.delete()
-  except Exception:
-   abort(404)
-  return  jsonify({"success": True, "delete": idt})
+def remove_drinks(payload, id):
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
+    if drink is None:
+        abort(404)
+    try:
+        drink.delete()
+        
+    except Exception:
+        abort(422)
+    
+    return jsonify({
+        "success": True,
+        "delete": id
+    }), 200
  
   
-   
-   
-  
- 
- 
-
-
-
 
 # Error Handling
 '''
 Example error handling for unprocessable entity
 '''
 
-#handel the 422 error
+#handle the 422 error
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
@@ -180,7 +176,8 @@ def unprocessable(error):
         "error": 422,
         "message": "unprocessable"
     }), 422
-#handel the 404 error
+
+#handle the 404 error
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
@@ -189,7 +186,16 @@ def not_found(error):
         "message": "resource not found"
     }), 404
 
-#handel authintication error
+#handle the 400 error
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        "success": False, 
+        "error": 400, 
+        "message": "bad request"
+    }), 400
+
+#handle authentication error
 @app.errorhandler(AuthError)
 def auth_error(error):
     print(error)
@@ -199,7 +205,7 @@ def auth_error(error):
         "message": error.error['description']
     }), error.status_code
 
-#handel the 401  error
+#handle the 401  error
 @app.errorhandler(401)
 def unauthorized(error):
     print(error)
@@ -209,4 +215,11 @@ def unauthorized(error):
         "message": 'Unathorized'
     }), 401
 
-
+#handle the 500  error
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify({
+        "success": False, 
+        "error": 500, 
+        "message": "internal server error"
+    }), 500
