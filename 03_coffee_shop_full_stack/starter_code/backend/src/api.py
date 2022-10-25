@@ -114,46 +114,25 @@ def create_new_drinks(payload):
         or appropriate status code indicating reason for failure
 '''
 #this endpoint  =help you modify drinks
-@app.route('/drinks/<drink_id>',methods=['PATCH'])
+@app.route('/drinks/<int:id>',methods=['PATCH'])
 @requires_auth('patch:drinks')
-def modifycoffe(payload,drink_id):
-
- req=request.get_json()
- try:
-  drink_id=int(drink_id)
- 
-  alle=Drink.query.all()
-  aux=0
-  for i in alle:
-   if int(i.id)==int(drink_id):
-     break
-   
-  r=i 
-  
- 
-  
-  if not r:
-   abort(404)
-
-  if(req['title']): 
-   r.title=req['title']
-  
- 
-  if req['recipe'] is None:
-  
-   r.update()
-  else:
-    r.recipe=json.dumps(req['recipe'])
-    print(json.dumps(req['recipe']))
- 
- 
-  print("final")
-  r.update()
-
- except Exception:
-        abort(400)
- 
- return jsonify({'success': True, 'drinks': [r.long()]}), 200
+def modify_drinks(payload, id):
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
+    if drink is None:
+        abort(404)
+    body = request.get_json()
+    try:
+        drink.title = body.get("title", None)
+        drink.recipe = json.dumps(body.get("recipe", None))
+        drink.update()
+    except Exception:
+        drink.rollback()
+        print(sys.exc_info())
+        abort(422)
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long()]
+    }), 200
 
 '''
 @TODO implement endpoint
