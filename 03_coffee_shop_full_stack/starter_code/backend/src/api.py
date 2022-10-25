@@ -56,7 +56,7 @@ def retrieve_drinks():
 '''
 
 @app.route('/drinks-detail', methods=['GET'])
-#@requires_auth('get:drinks-detail')
+@requires_auth('get:drinks-detail')
 #this endpoint give you all drinks with persmzssion get 
 def show_drinks(payload):
     try:
@@ -81,24 +81,26 @@ def show_drinks(payload):
 #this endpoint help you post new drink
 @app.route('/drinks',methods=['POST'])
 @requires_auth('post:drinks')
-def adddrink(payload):
-  try:
-  
-   drink=Drink()
-   req = request.get_json()
-   drink.title=req['title']
-   
-   drink.recipe=json.dumps(req['recipe'])
-   print(type(req['recipe']))
-   print(req['recipe'])
-   
-   drink.insert()
-  except:
-   abort(400) 
-  
-  return jsonify({'success': True,'drinks':[drink.long()]})
- 
+def create_new_drinks(payload):
+    body = request.get_json()
 
+    new_title = body.get("title", None)
+    new_recipe = json.dumps(body.get("recipe", None))
+    if ((new_title is None) or (new_recipe is None)):
+        abort(422)
+    try:
+        drink = Drink(title=new_title, recipe=new_recipe)
+        drink.insert()
+    except Exception:
+        drink.rollback()
+        print(sys.exc_info())
+        abort(422)
+    return jsonify({
+        "success": True,
+        "drink": [drink.long()]
+    }), 200
+
+ 
 
 '''
 @TODO implement endpoint
