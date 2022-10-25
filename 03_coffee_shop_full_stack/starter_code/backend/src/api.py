@@ -19,8 +19,6 @@ CORS(app)
 !! Running this funciton will add one
 '''
 
-
-
 '''
 @TODO implement endpoint
     GET /drinks
@@ -32,7 +30,7 @@ CORS(app)
 @app.route('/')
 def index():
  
-  return '<h1>Hello, Welome to CoffesShop API </h1>'
+  return '<h1>Hello, Welome to CoffeeShop API </h1>'
 #this endpoint give you all drinks
 @app.route('/drinks')
 def retrieve_drinks():
@@ -58,16 +56,18 @@ def retrieve_drinks():
 '''
 
 @app.route('/drinks-detail', methods=['GET'])
-@requires_auth('get:drinks-detail')
+#@requires_auth('get:drinks-detail')
 #this endpoint give you all drinks with persmzssion get 
-def aux(payload):
- 
-  drinks=Drink.query.all()
-
-  
-  return jsonify({
+def show_drinks(payload):
+    try:
+        drinks = [drink.long() for drink in Drink.query.all()]
+        
+    except Exception:
+        abort(400)
+    return jsonify({
         'success': True,
-        'drinks': [i.short() for i in drinks]}), 200 
+        'drinks': drinks
+    }), 200
 
 '''
 @TODO implement endpoint
