@@ -2,9 +2,9 @@ import os
 from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
 import json
-from .env.environmen import database_link
-from .env.environmen import file_name
-database_filename = file_name
+from .env.environment import database_link
+from .env.environment import database_filename
+database_filename = "database.db"
 project_dir = os.path.dirname(os.path.abspath(__file__))
 database_path =database_link
 
